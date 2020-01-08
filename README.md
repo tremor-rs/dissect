@@ -11,3 +11,4 @@
 
 ---
 
+Dissect is a library which is loosely based on logstash's dissect. It extracts data from strings.
