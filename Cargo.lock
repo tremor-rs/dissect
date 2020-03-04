@@ -43,7 +43,7 @@ dependencies = [
 
 [[package]]
 name = "dissect"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "halfbrown 0.1.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "simd-json 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
