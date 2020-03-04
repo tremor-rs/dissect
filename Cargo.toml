@@ -1,6 +1,6 @@
 [package]
 name = "dissect"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["The Tremor Team"]
 edition = "2018"
 license = "Apache-2.0"
@@ -8,4 +8,4 @@ description = "Logstash inspired dissect extractor"
 
 [dependencies]
 halfbrown = "0.1"
-simd-json = {version = "0.2", features = ["known-key"]}
+simd-json = {version = "0.3", features = ["known-key"]}
