@@ -1,4 +1,4 @@
-# KV &emsp; ![Build Status] ![Quality Checks] ![License Checks] ![Security Checks] [![Code Coverage]][codecov.io]
+# Dissect &emsp; ![Build Status] ![Quality Checks] ![License Checks] ![Security Checks] [![Code Coverage]][codecov.io]
 
 [Build Status]: https://github.com/wayfair-tremor/dissect/workflows/Tests/badge.svg
 [Quality Checks]: https://github.com/wayfair-tremor/dissect/workflows/Checks/badge.svg
