@@ -1,11 +1,13 @@
-# Dissect &emsp; ![Build Status] ![Quality Checks] ![License Checks] ![Security Checks] [![Code Coverage]][codecov.io]
+# Dissect &emsp; [![Latest Version]][crates.io] ![Build Status] ![Quality Checks] ![License Checks] ![Security Checks] [![Code Coverage]][codecov.io]
 
 [Build Status]: https://github.com/wayfair-tremor/dissect/workflows/Tests/badge.svg
 [Quality Checks]: https://github.com/wayfair-tremor/dissect/workflows/Checks/badge.svg
 [License Checks]: https://github.com/wayfair-tremor/dissect/workflows/License%20audit/badge.svg
 [Security Checks]: https://github.com/wayfair-tremor/dissect/workflows/Security%20audit/badge.svg
-[Code Coverage]: https://codecov.io/gh/wayfair-tremor/dissect/branch/master/graph/badge.svg
+[Code Coverage]: https://codecov.io/gh/wayfair-tremor/dissect/branch/main/graph/badge.svg
 [codecov.io]: https://codecov.io/gh/wayfair-tremor/dissect
+[Latest Version]: https://img.shields.io/crates/v/dissect.svg
+[crates.io]: https://crates.io/crates/dissect
 
 **dissect parser**
 

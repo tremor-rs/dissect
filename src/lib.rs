@@ -181,8 +181,7 @@
 #![recursion_limit = "1024"]
 #![deny(
     clippy::all,
-    clippy::result_unwrap_used,
-    clippy::option_unwrap_used,
+    clippy::unwrap_used,
     clippy::unnecessary_unwrap,
     clippy::pedantic
 )]
@@ -505,15 +504,14 @@ impl Pattern {
                     convert,
                 }) => {
                     let name = if *lookup {
-                        match ignored.remove(name) {
-                            Some(s) => {
-                                if s.is_empty() {
-                                    return None;
-                                } else {
-                                    s
-                                }
+                        if let Some(s) = ignored.remove(name) {
+                            if s.is_empty() {
+                                return None;
+                            } else {
+                                s
                             }
-                            _ => return None,
+                        } else {
+                            return None;
                         }
                     } else {
                         name.clone()
@@ -579,7 +577,7 @@ impl Pattern {
                                             return None;
                                         }
                                     }
-                                    _ => {
+                                    Some(_) => {
                                         return None;
                                     }
                                 }
