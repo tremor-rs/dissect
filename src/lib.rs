@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![forbid(warnings)]
 //! Dissect is a library which is loosely based on logstash's dissect. It extracts data from
 //! strings.
 //!
@@ -177,7 +176,7 @@
 //! # Ok::<(), Error>(())
 //! ```
 
-#![forbid(warnings)]
+#![deny(warnings)]
 #![recursion_limit = "1024"]
 #![deny(
     clippy::all,
@@ -476,12 +475,12 @@ impl Pattern {
                 // No more pattern we're good if no data is left otherwise
                 // we do not match
                 None => {
-                    if data.is_empty() {
-                        return Some(r);
+                    return if data.is_empty() {
+                        Some(r)
                     } else {
                         // We still have data left so it's not a string
-                        return None;
-                    }
+                        None
+                    };
                 }
                 // We want to skip some text, do so if it's there
                 Some(Command::Delimiter(s)) => {
@@ -507,9 +506,8 @@ impl Pattern {
                         if let Some(s) = ignored.remove(name) {
                             if s.is_empty() {
                                 return None;
-                            } else {
-                                s
                             }
+                            s
                         } else {
                             return None;
                         }
