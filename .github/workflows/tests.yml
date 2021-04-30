@@ -8,11 +8,11 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Install deps [Linux]
-        run: sudo apt-get install -y libssl1.0-dev libssl1.0
+        run: sudo apt-get -qy update && sudo apt-get install -y libssl-dev libssl1.1
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
           override: true
+          profile: minimal
       - name: Run tests
         run: cargo test --all
   code-coverage:
@@ -20,19 +20,19 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Install deps
-        run: sudo apt-get install -y libssl1.0-dev libssl1.0
+        run: sudo apt-get -qy update && sudo apt-get install -y libssl-dev libssl1.1
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
           override: true
+          profile: minimal
       - name: Run cargo-tarpaulin
         uses: actions-rs/tarpaulin@v0.1
         env:
           RUSTFLAGS: -C target-cpu=native
         with:
-          version: '0.11.0'
-          args: '--out Xml --exclude-files target* --exclude-files depricated/* --all'
+          version: "0.14.2"
+          args: " --exclude-files target* --all"
       - uses: codecov/codecov-action@v1.0.2
         with:
-          token: ${{secrets.CODECOV_TOKEN}}
+          token: ${{secrets.CODECOV_TOKEN}} #required
           file: ./cobertura.xml
