@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Safety cheks
+      - name: Safety checks
         run: ./.github/checks/safety.sh -a
   unused-deps:
     runs-on: ubuntu-latest
@@ -31,8 +31,9 @@ jobs:
       - uses: actions/checkout@v1
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
           override: true
+          profile: minimal
+          components: rustfmt
       - name: Check Formating
         run: cargo fmt --all -- --check
   clippy-check:
@@ -40,13 +41,12 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Install deps
-        run: sudo apt-get install -y libssl1.0-dev libssl1.0
+        run: sudo apt-get -qy update && sudo apt-get install -y libssl-dev libssl1.1
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
           override: true
-      - name: Install clippy
-        run: rustup component add clippy
+          profile: minimal
+          components: clippy
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
