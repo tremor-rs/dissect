@@ -449,7 +449,7 @@ impl Pattern {
                     None => r.insert(name.into(), Value::from(data.to_owned())),
                     Some(Value::String(s)) => {
                         let mut s = s.to_string();
-                        s.push_str(&last_sep);
+                        s.push_str(last_sep);
                         s.push_str(data);
                         r.insert(name.into(), Value::from(s))
                     }
