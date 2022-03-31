@@ -30,9 +30,10 @@ jobs:
         env:
           RUSTFLAGS: -C target-cpu=native
         with:
-          version: "0.19.1"
-          args: " --exclude-files target* --all "
-      - uses: codecov/codecov-action@v1.0.2
+          version: "0.20.0"
+          args: " --exclude-files target* --all --out Lcov"
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
         with:
-          token: ${{secrets.CODECOV_TOKEN}} #required
-          file: ./cobertura.xml
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./lcov.info
