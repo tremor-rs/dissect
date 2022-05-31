@@ -9,4 +9,4 @@ readme = "README.md"
 
 [dependencies]
 halfbrown = "0.1"
-simd-json = {version = "0.4", features = ["known-key"]}
+simd-json = { version = "0.5", features = ["known-key"] }
