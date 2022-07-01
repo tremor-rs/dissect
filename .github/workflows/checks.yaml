@@ -34,6 +34,7 @@ jobs:
           override: true
           profile: minimal
           components: rustfmt
+          toolchain: stable
       - name: Check Formating
         run: cargo fmt --all -- --check
   clippy-check:
@@ -47,6 +48,7 @@ jobs:
           override: true
           profile: minimal
           components: clippy
+          toolchain: stable
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

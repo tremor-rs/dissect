@@ -13,6 +13,7 @@ jobs:
         with:
           override: true
           profile: minimal
+          toolchain: stable
       - name: Run tests
         run: cargo test --all
   code-coverage:
@@ -25,6 +26,7 @@ jobs:
         with:
           override: true
           profile: minimal
+          toolchain: stable
       - name: Run cargo-tarpaulin
         uses: actions-rs/tarpaulin@v0.1
         env:
