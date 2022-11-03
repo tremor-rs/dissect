@@ -216,7 +216,7 @@ enum Command {
     Padding(String),
 }
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone, Eq)]
 pub enum Error {
     ConnectedExtractors(usize),
     Unterminated(usize),
@@ -293,7 +293,7 @@ impl Pattern {
                     ignore: true,
                     add: false,
                     lookup: false,
-                    name: "".to_owned(),
+                    name: String::new(),
                     convert: ExtractType::String,
                 });
             }
