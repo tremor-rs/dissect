@@ -641,6 +641,7 @@ mod test {
         Command::Padding(name.to_string())
     }
 
+    #[allow(clippy::unnecessary_wraps)] // this is a test function to match the corresponding run function
     fn v<'dissect, T: Copy>(s: &'dissect [(&str, T)]) -> Option<Object<'dissect>>
     where
         Value<'dissect>: From<T>,
@@ -955,7 +956,7 @@ mod test {
     fn do_extract() {
         let pattern = "this is a %{name} case";
         let input = "this is a test case";
-        assert_pattern!(pattern, input, ("name", "test"))
+        assert_pattern!(pattern, input, ("name", "test"));
     }
 
     #[test]
@@ -965,7 +966,7 @@ mod test {
         let mut m = Object::new();
         m.insert("what".into(), Value::from("test"));
         m.insert("name".into(), Value::from("cake"));
-        assert_eq!(p.run("this is a test case named cake"), Some(m))
+        assert_eq!(p.run("this is a test case named cake"), Some(m));
     }
 
     #[test]
@@ -997,7 +998,7 @@ mod test {
         let mut m = Object::new();
         m.insert("what".into(), Value::from("test"));
         m.insert("name".into(), Value::from("cake"));
-        assert_eq!(p.run("this is a test      case named cake"), Some(m))
+        assert_eq!(p.run("this is a test      case named cake"), Some(m));
     }
 
     #[test]
@@ -1008,7 +1009,7 @@ mod test {
             vec![pad(" "), del("this"), pad(" "), pad("-"), del("works"),]
         );
         let m = HashMap::new();
-        assert_eq!(p.run("this     -----works"), Some(m))
+        assert_eq!(p.run("this     -----works"), Some(m));
     }
 
     #[test]
@@ -1044,7 +1045,7 @@ mod test {
         let mut m = Object::new();
         m.insert("a".into(), Value::from("this"));
         m.insert("b".into(), Value::from("works"));
-        assert_eq!(p.run("this     works"), Some(m))
+        assert_eq!(p.run("this     works"), Some(m));
     }
 
     #[test]
@@ -1053,7 +1054,7 @@ mod test {
         assert_eq!(p, vec![pad(" "), pat("b"),]);
         let mut m = Object::new();
         m.insert("b".into(), Value::from("works"));
-        assert_eq!(p.run("     works"), Some(m))
+        assert_eq!(p.run("     works"), Some(m));
     }
 
     #[test]
@@ -1062,7 +1063,7 @@ mod test {
         assert_eq!(p, vec![pat("a"), pad(" ")]);
         let mut m = Object::new();
         m.insert("a".into(), Value::from("this"));
-        assert_eq!(p.run("this     "), Some(m))
+        assert_eq!(p.run("this     "), Some(m));
     }
 
     #[test]
@@ -1083,7 +1084,7 @@ mod test {
         );
         let mut m = Object::new();
         m.insert("a".into(), Value::from("this"));
-        assert_eq!(p.run("this"), Some(m))
+        assert_eq!(p.run("this"), Some(m));
     }
 
     #[test]
@@ -1115,7 +1116,7 @@ mod test {
         let mut m = Object::new();
         m.insert("what".into(), Value::from("test"));
         m.insert("name".into(), Value::from("cake"));
-        assert_eq!(p.run("this is a test case named cake"), Some(m))
+        assert_eq!(p.run("this is a test case named cake"), Some(m));
     }
 
     #[test]
@@ -1124,7 +1125,7 @@ mod test {
             .expect("failed to compile pattern");
         let mut m = Object::new();
         m.insert("name".into(), Value::from("cake"));
-        assert_eq!(p.run("this is a test case named cake"), Some(m))
+        assert_eq!(p.run("this is a test case named cake"), Some(m));
     }
 
     #[test]
@@ -1149,7 +1150,7 @@ mod test {
             .expect("failed to compile pattern");
         let mut m = Object::new();
         m.insert("arr".into(), Value::from("test cake"));
-        assert_eq!(p.run("this is a test case named cake"), Some(m))
+        assert_eq!(p.run("this is a test case named cake"), Some(m));
     }
 
     #[test]
@@ -1158,9 +1159,10 @@ mod test {
             .expect("failed to compile pattern");
         let mut m = Object::new();
         m.insert("arr".into(), Value::from("test cake"));
-        assert_eq!(p.run("this is a test case named cake"), Some(m))
+        assert_eq!(p.run("this is a test case named cake"), Some(m));
     }
 
+    #[allow(clippy::too_many_lines)]
     #[test]
     fn dissect_all_usecases() {
         let patterns = vec![
@@ -1194,7 +1196,6 @@ mod test {
                             ("message", "log failed"),
                         ])),
                     ),
-
                     (
                         "%{}>%{+syslog_timestamp} %{+syslog_timestamp} %{+syslog_timestamp} %{syslog_hostname} %{syslog_program}: %{full_message}",
                         "foo>12345 67890 12345 host program: log failed",
@@ -1207,7 +1208,6 @@ mod test {
                     ),
 
                     (
-
                         "%{syslog_timestamp} %{wf_host} %{}: %{log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{job_name} %{build_num} %{message} completed: %{completed}\n",
                         "12345 host foo: 12345 67890 12345 67890 12345 some_job 12345 some_message completed: 100\n",
                         v(&([
@@ -1220,9 +1220,7 @@ mod test {
                                   ("completed", "100"),
                         ])),
                     ),
-
                     (
-
                         "%{syslog_timestamp} %{wf_host} %{}: %{log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{job_name} %{build_num} %{message}\n",
                         "12345 host foo: 12345 67890 12345 67890 12345 nice_job 900 here we go again\n",
                         v(&([
@@ -1234,7 +1232,6 @@ mod test {
                                  ("message", "here we go again")
                         ]))
                     ),
-
                    (
                         "%{syslog_timestamp} %{wf_host} %{} %{log_timestamp}  %{log_level}    %{main}     %{logger}%{_}%{message}%{_}",
                         "12345 host foo 12345  high    main     dummy_logger some_message  ",
@@ -1248,10 +1245,7 @@ mod test {
                                     ("message", "some_message")
                                 ])
                         ),
-
-
                         (
-
                         "%{syslog_timestamp} %{host} %{?kafka_tag} %{log_timestamp}: %{log_level} (%{logger}): %{full_message}",
                         "12345 foo some_tag 12345: high (dummy): welcome",
                         v(&[
@@ -1263,7 +1257,6 @@ mod test {
                                 ("full_message", "welcome")
                         ])
                         ),
-
                         (
                             "%{syslog_timestamp} %{host} %{} %{message}",
                             "12345 foo bar here we go",
@@ -1287,7 +1280,6 @@ mod test {
                         ])
 
                         ),
-
         (
                         "%{syslog_timestamp} %{host}%{_}[%{log_timestamp}][%{log_level}%{_}][%{logger}%{_}] %{message}",
                         "12345 foo [12345 67890][high ][dummy ] too many brackets here",
@@ -1326,9 +1318,7 @@ mod test {
                                    ("logger", "dummy"),
                                    ("message", "alexanderplatz")
                             ])
-
         ),
-
         (
                         "%{} %{} %{} %{source} %{}:%{message}",
                         "foo bar baz light quox:this was fun",
@@ -1351,7 +1341,6 @@ mod test {
                             ),
 
                             (
-
                 "%{syslog_timestamp} %{host}%{_}%{}: %{syslog_message}",
                 "12345 ghost foo: this is the last one",
                 v(&[
@@ -1359,19 +1348,16 @@ mod test {
                        ("host", "ghost"),
                        ("syslog_message", "this is the last one")
                 ])
-
                 ),
-
                                 (
                                     "this is a %{?what} named %{name}",
                                     "this is a test named cake",
                                     v(&[("name", "cake")])
                                     )
-
                 ];
 
         for (pattern, input, expected) in patterns {
-            assert_eq!(run(pattern, input), expected)
+            assert_eq!(run(pattern, input), expected);
         }
     }
 
@@ -1440,7 +1426,7 @@ mod test {
         "%{syslog_timestamp} %{host}%{_}%{}: %{syslog_message}",
     ];
         for p in patterns {
-            assert!(Pattern::compile(p).is_ok())
+            assert!(Pattern::compile(p).is_ok());
         }
     }
 }
