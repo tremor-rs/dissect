@@ -28,7 +28,7 @@ where
 {
     use std::borrow::Cow;
     Some(
-        s.into_iter()
+        s.iter()
             .map(|(x, y)| (Into::<Cow<'dissect, str>>::into(*x), Value::from(*y)))
             .collect(),
     )
