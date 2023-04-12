@@ -234,18 +234,16 @@ impl fmt::Display for Error {
         match self {
             Self::ConnectedExtractors(p) => write!(
                 f,
-                "A dilimiter needs to be provided between the two patterns at {}",
-                p
+                "A dilimiter needs to be provided between the two patterns at {p}"
             ),
-            Self::Unterminated(p) => write!(f, "Unterminated patter at {}", p),
+            Self::Unterminated(p) => write!(f, "Unterminated patter at {p}"),
             Self::PaddingFollowedBySelf(p) => write!(
                 f,
-                "The padding at {} can't be followed up by a dilimiter that begins with it",
-                p
+                "The padding at {p} can't be followed up by a dilimiter that begins with it"
             ),
-            Self::InvalidPad(p) => write!(f, "Invalid padding at {}", p),
-            Self::InvalidType(p, t) => write!(f, "Invalid type '{}' at {}", p, t),
-            Self::InvalidEscape(s) => write!(f, "Invalid escape sequence \\'{}' is not valid.", s),
+            Self::InvalidPad(p) => write!(f, "Invalid padding at {p}"),
+            Self::InvalidType(p, t) => write!(f, "Invalid type '{p}' at {t}"),
+            Self::InvalidEscape(s) => write!(f, "Invalid escape sequence \\'{s}' is not valid."),
             Self::UnterminatedEscape => write!(
                 f,
                 "Unterminated escape at the end of line or of a delimiter %{{ can't be escaped"
