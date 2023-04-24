@@ -35,7 +35,6 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 name = "dissect"
 version = "0.6.0"
 dependencies = [
- "halfbrown 0.2.0",
  "simd-json",
 ]
 
@@ -66,15 +65,6 @@ dependencies = [
  "fxhash",
  "hashbrown",
  "serde",
-]
-
-[[package]]
-name = "halfbrown"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "389d755cc2bcc8cdb7554b89ddaa59d9275a727ec8915b0e2bc4176c33cc39cb"
-dependencies = [
- "hashbrown",
 ]
 
 [[package]]
@@ -238,7 +228,7 @@ version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1663db38e6e50038d4de020667c364490d43473ad6d073822a6af6576fc343a5"
 dependencies = [
- "halfbrown 0.1.18",
+ "halfbrown",
  "lexical-core",
  "serde",
  "serde_json",
@@ -282,7 +272,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "995de1aa349a0dc50f4aa40870dce12961a30229027230bad09acd2843edbe9e"
 dependencies = [
  "float-cmp",
- "halfbrown 0.1.18",
+ "halfbrown",
  "itoa 1.0.2",
  "ryu",
 ]
