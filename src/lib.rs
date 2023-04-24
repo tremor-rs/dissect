@@ -17,13 +17,13 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::Value;
+//! use simd_json::borrowed::{Value, Object};
 //!
 //! let filter = Pattern::compile("%{a} %{b}")?;
 //! let input = "John Doe";
 //!
 //! let output = filter.run(input).unwrap_or_default();
-//! let mut expected = halfbrown::HashMap::new();
+//! let mut expected = Object::new();
 //! expected.insert("a".into(), Value::from("John"));
 //! expected.insert("b".into(), Value::from("Doe"));
 //!
@@ -40,11 +40,11 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::Value;
+//! use simd_json::borrowed::{Value, Object};
 //!
 //! let output = Pattern::compile("%{name}, %{age}")?;
 //! let output = output.run("John Doe, 22").unwrap_or_default();
-//! let mut expected = halfbrown::HashMap::new();
+//! let mut expected = Object::new();
 //! expected.insert("name".into(), Value::from("John Doe"));
 //! expected.insert("age".into(), Value::from("22"));
 //!
@@ -58,10 +58,10 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::Value;
+//! use simd_json::borrowed::{Value, Object};
 //! let output = Pattern::compile( "%{+name} %{+name}, %{age}")?;
 //! let output = output.run("John Doe, 22").unwrap_or_default();
-//! let mut expected = halfbrown::HashMap::new();
+//! let mut expected = Object::new();
 //! expected.insert("name".into(), Value::from("John Doe"));
 //! expected.insert("age".into(), Value::from("22"));
 //!
@@ -86,10 +86,10 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::Value;
+//! use simd_json::borrowed::{Value, Object};
 //! let output = Pattern::compile("%{?name}, %{&name}")?;
 //! let output = output.run( "John Doe, 22").unwrap_or_default();
-//! let mut expected = halfbrown::HashMap::new();
+//! let mut expected = Object::new();
 //! expected.insert("John Doe".into(), Value::from("22"));
 //! assert_eq!(output, expected);
 //! # Ok::<(), Error>(())
@@ -101,11 +101,11 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::Value;
+//! use simd_json::borrowed::{Value, Object};
 //!
 //! let output = Pattern::compile("%{name}, %{age}")?;
 //! let output = output.run(", 22").unwrap_or_default();
-//! let mut expected = halfbrown::HashMap::new();
+//! let mut expected = Object::new();
 //! expected.insert("name".into(), Value::from(""));
 //! expected.insert("age".into(), Value::from("22"));
 //! assert_eq!(output, expected);
@@ -118,10 +118,10 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::Value;
+//! use simd_json::borrowed::{Value, Object};
 //! let output = Pattern::compile("%{?first_name} %{last_name}, %{age}")?;
 //! let output = output.run("John Doe, 22").unwrap_or_default();
-//! let mut expected = halfbrown::HashMap::new();
+//! let mut expected = Object::new();
 //! expected.insert("last_name".into(), Value::from("Doe"));
 //! expected.insert("age".into(), Value::from("22"));
 //! assert_eq!(output, expected);
@@ -137,10 +137,10 @@
 //! ```rust
 //!
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::Value;
+//! use simd_json::borrowed::{Value, Object};
 //! let output = Pattern::compile("%{name}, %{age:int}")?;
 //! let output = output.run( "John Doe, 22").unwrap_or_default();
-//! let mut expected = halfbrown::HashMap::new();
+//! let mut expected = Object::new();
 //! expected.insert("name".into(), Value::from("John Doe"));
 //! expected.insert("age".into(),Value::from(22));
 //! assert_eq!(output, expected);
@@ -154,10 +154,10 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::Value;
+//! use simd_json::borrowed::{Value, Object};
 //! let output = Pattern::compile("%{name}, %{_}%{age}")?;
 //! let output = output.run("John Doe,                22").unwrap_or_default();
-//! let mut expected = halfbrown::HashMap::new();
+//! let mut expected = Object::new();
 //! expected.insert("name".into(), Value::from("John Doe"));
 //! expected.insert("age".into(), Value::from("22"));
 //! assert_eq!(output, expected);
@@ -166,10 +166,10 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::Value;
+//! use simd_json::borrowed::{Value, Object};
 //! let output = Pattern::compile("%{name}, %{_(-)}%{age}")?;
 //! let output = output.run("John Doe, -----------------------22").unwrap_or_default();
-//! let mut expected = halfbrown::HashMap::new();
+//! let mut expected = Object::new();
 //! expected.insert("name".into(), Value::from("John Doe"));
 //! expected.insert("age".into(), Value::from("22"));
 //! assert_eq!(output, expected);
@@ -186,9 +186,8 @@
 )]
 #![allow(clippy::must_use_candidate)]
 
-use halfbrown::HashMap;
 use simd_json::value::borrowed::{Object, Value};
-use std::fmt;
+use std::{collections::HashMap, fmt};
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 enum ExtractType {
@@ -1006,7 +1005,7 @@ mod test {
             p,
             vec![pad(" "), del("this"), pad(" "), pad("-"), del("works"),]
         );
-        let m = HashMap::new();
+        let m = simd_json::borrowed::Object::new();
         assert_eq!(p.run("this     -----works"), Some(m));
     }
 
