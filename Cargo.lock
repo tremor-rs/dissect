@@ -20,12 +20,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
-name = "byteorder"
-version = "1.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
-
-[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -48,22 +42,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "fxhash"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c31b6d751ae2c7f11320402d34e41349dd1016f8d5d45e48c4312bc8625af50c"
-dependencies = [
- "byteorder",
-]
-
-[[package]]
 name = "halfbrown"
-version = "0.1.18"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e2a3c70a9c00cc1ee87b54e89f9505f73bb17d63f1b25c9a462ba8ef885444f"
+checksum = "389d755cc2bcc8cdb7554b89ddaa59d9275a727ec8915b0e2bc4176c33cc39cb"
 dependencies = [
- "fxhash",
  "hashbrown",
+ "rustc-hash",
  "serde",
 ]
 
@@ -186,6 +171,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "rustc-hash"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
+
+[[package]]
 name = "ryu"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -224,9 +215,9 @@ dependencies = [
 
 [[package]]
 name = "simd-json"
-version = "0.8.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1663db38e6e50038d4de020667c364490d43473ad6d073822a6af6576fc343a5"
+checksum = "17c317658b6755f4acf95e96aebec72985534673261d65f27624a484b0213f5f"
 dependencies = [
  "halfbrown",
  "lexical-core",
@@ -267,9 +258,9 @@ checksum = "f7fe0bb3479651439c9112f72b6c505038574c9fbb575ed1bf3b797fa39dd564"
 
 [[package]]
 name = "value-trait"
-version = "0.5.1"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "995de1aa349a0dc50f4aa40870dce12961a30229027230bad09acd2843edbe9e"
+checksum = "733e1909354ceff16f7e1f7ddebc063455b8fda4968d91760a7c6115b96647a5"
 dependencies = [
  "float-cmp",
  "halfbrown",

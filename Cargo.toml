@@ -8,4 +8,4 @@ description = "Logstash inspired dissect extractor"
 readme = "README.md"
 
 [dependencies]
-simd-json = { version = "0.8", features = ["known-key"] }
+simd-json = { version = "0.9", features = ["known-key"] }
