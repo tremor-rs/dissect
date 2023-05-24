@@ -17,7 +17,7 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::{Value, Object};
+//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
 //!
 //! let filter = Pattern::compile("%{a} %{b}")?;
 //! let input = "John Doe";
@@ -40,7 +40,7 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::{Value, Object};
+//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
 //!
 //! let output = Pattern::compile("%{name}, %{age}")?;
 //! let output = output.run("John Doe, 22").unwrap_or_default();
@@ -58,7 +58,7 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::{Value, Object};
+//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
 //! let output = Pattern::compile( "%{+name} %{+name}, %{age}")?;
 //! let output = output.run("John Doe, 22").unwrap_or_default();
 //! let mut expected = Object::new();
@@ -86,7 +86,7 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::{Value, Object};
+//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
 //! let output = Pattern::compile("%{?name}, %{&name}")?;
 //! let output = output.run( "John Doe, 22").unwrap_or_default();
 //! let mut expected = Object::new();
@@ -101,7 +101,7 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::{Value, Object};
+//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
 //!
 //! let output = Pattern::compile("%{name}, %{age}")?;
 //! let output = output.run(", 22").unwrap_or_default();
@@ -118,7 +118,7 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::{Value, Object};
+//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
 //! let output = Pattern::compile("%{?first_name} %{last_name}, %{age}")?;
 //! let output = output.run("John Doe, 22").unwrap_or_default();
 //! let mut expected = Object::new();
@@ -137,7 +137,7 @@
 //! ```rust
 //!
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::{Value, Object};
+//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
 //! let output = Pattern::compile("%{name}, %{age:int}")?;
 //! let output = output.run( "John Doe, 22").unwrap_or_default();
 //! let mut expected = Object::new();
@@ -154,7 +154,7 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::{Value, Object};
+//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
 //! let output = Pattern::compile("%{name}, %{_}%{age}")?;
 //! let output = output.run("John Doe,                22").unwrap_or_default();
 //! let mut expected = Object::new();
@@ -166,7 +166,7 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::borrowed::{Value, Object};
+//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
 //! let output = Pattern::compile("%{name}, %{_(-)}%{age}")?;
 //! let output = output.run("John Doe, -----------------------22").unwrap_or_default();
 //! let mut expected = Object::new();
@@ -186,7 +186,10 @@
 )]
 #![allow(clippy::must_use_candidate)]
 
-use simd_json::value::borrowed::{Object, Value};
+use simd_json::{
+    value::borrowed::{Object, Value},
+    ObjectHasher,
+};
 use std::{collections::HashMap, fmt};
 
 #[derive(PartialEq, Debug, Clone, Copy)]
@@ -463,7 +466,7 @@ impl Pattern {
             Some(())
         }
 
-        let mut r = Object::new();
+        let mut r = Object::with_capacity_and_hasher(0, ObjectHasher::default());
         let mut ignored: HashMap<String, String> = HashMap::new();
         let mut last_sep = String::from(" ");
         let mut t = 0;
@@ -615,6 +618,7 @@ impl PartialEq<Vec<Command>> for Pattern {
 mod test {
     use super::*;
     use simd_json::value::borrowed::Value;
+    use simd_json::ObjectInit;
 
     fn cp(pattern: &str) -> Pattern {
         Pattern::compile(pattern).expect("failed to compile pattern")
