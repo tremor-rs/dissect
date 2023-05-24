@@ -15,6 +15,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "arrayvec"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8da52d66c7071e2e3fa2a1e5c6d088fec47b593032b254f5e980de8ea54454d6"
+
+[[package]]
 name = "autocfg"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -55,10 +61,11 @@ dependencies = [
 
 [[package]]
 name = "halfbrown"
-version = "0.2.0"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "389d755cc2bcc8cdb7554b89ddaa59d9275a727ec8915b0e2bc4176c33cc39cb"
+checksum = "f985624e90f861184145c13b736873a0f83cdb998a292dbb0653598ab03aecbf"
 dependencies = [
+ "arrayvec",
  "hashbrown",
  "serde",
 ]
@@ -226,9 +233,9 @@ dependencies = [
 
 [[package]]
 name = "simd-json"
-version = "0.10.0"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8e989e2d7bc6ed726cb3451a0c3b380b259a800dd7b7c6f4004d27ad89c7488"
+checksum = "23dd89aebcc2d85463280220036f2dc4734268a52d60e7c483a3b3c228389f49"
 dependencies = [
  "ahash",
  "halfbrown",
