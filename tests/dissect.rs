@@ -14,6 +14,8 @@
 
 use dissect::*;
 use simd_json::value::borrowed::{Object, Value};
+#[cfg(feature = "known-key")]
+use simd_json::ObjectInit;
 
 fn cp(pattern: &str) -> Pattern {
     Pattern::compile(pattern).expect("failed to compile pattern")
