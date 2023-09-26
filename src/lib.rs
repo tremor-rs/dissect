@@ -17,17 +17,16 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
-//!
+//! use simd_json::{borrowed::Value, prelude::*};
 //! let filter = Pattern::compile("%{a} %{b}")?;
 //! let input = "John Doe";
 //!
-//! let output = filter.run(input).unwrap_or_default();
-//! let mut expected = Object::new();
-//! expected.insert("a".into(), Value::from("John"));
-//! expected.insert("b".into(), Value::from("Doe"));
+//! let output = filter.run(input);
+//! let mut expected = Value::object();
+//! expected.try_insert("a", Value::from("John"));
+//! expected.try_insert("b", Value::from("Doe"));
 //!
-//! assert_eq!(output, expected);
+//! assert_eq!(output.as_ref(), expected.as_object());
 //! # Ok::<(), Error>(())
 //! ```
 //!
@@ -40,15 +39,15 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
+//! use simd_json::{borrowed::Value, prelude::*};
 //!
 //! let output = Pattern::compile("%{name}, %{age}")?;
-//! let output = output.run("John Doe, 22").unwrap_or_default();
-//! let mut expected = Object::new();
-//! expected.insert("name".into(), Value::from("John Doe"));
-//! expected.insert("age".into(), Value::from("22"));
+//! let output = output.run("John Doe, 22");
+//! let mut expected = Value::object();
+//! expected.try_insert("name", Value::from("John Doe"));
+//! expected.try_insert("age", Value::from("22"));
 //!
-//! assert_eq!(output, expected);
+//! assert_eq!(output.as_ref(), expected.as_object());
 //! # Ok::<(), Error>(())
 //! ```
 //!
@@ -58,14 +57,15 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
-//! let output = Pattern::compile( "%{+name} %{+name}, %{age}")?;
-//! let output = output.run("John Doe, 22").unwrap_or_default();
-//! let mut expected = Object::new();
-//! expected.insert("name".into(), Value::from("John Doe"));
-//! expected.insert("age".into(), Value::from("22"));
+//! use simd_json::{borrowed::Value, prelude::*};
 //!
-//! assert_eq!(output, expected);
+//! let output = Pattern::compile( "%{+name} %{+name}, %{age}")?;
+//! let output = output.run("John Doe, 22");
+//! let mut expected = Value::object();
+//! expected.try_insert("name", Value::from("John Doe"));
+//! expected.try_insert("age", Value::from("22"));
+//!
+//! assert_eq!(output.as_ref(), expected.as_object());
 //! # Ok::<(), Error>(())
 //! ```
 //!
@@ -86,12 +86,12 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
+//! use simd_json::{borrowed::Value, prelude::*};
 //! let output = Pattern::compile("%{?name}, %{&name}")?;
-//! let output = output.run( "John Doe, 22").unwrap_or_default();
-//! let mut expected = Object::new();
-//! expected.insert("John Doe".into(), Value::from("22"));
-//! assert_eq!(output, expected);
+//! let output = output.run( "John Doe, 22");
+//! let mut expected = Value::object();
+//! expected.try_insert("John Doe", Value::from("22"));
+//! assert_eq!(output.as_ref(), expected.as_object());
 //! # Ok::<(), Error>(())
 //! ```
 //!
@@ -101,14 +101,14 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
+//! use simd_json::{borrowed::Value, prelude::*};
 //!
 //! let output = Pattern::compile("%{name}, %{age}")?;
-//! let output = output.run(", 22").unwrap_or_default();
-//! let mut expected = Object::new();
-//! expected.insert("name".into(), Value::from(""));
-//! expected.insert("age".into(), Value::from("22"));
-//! assert_eq!(output, expected);
+//! let output = output.run(", 22");
+//! let mut expected = Value::object();
+//! expected.try_insert("name", Value::from(""));
+//! expected.try_insert("age", Value::from("22"));
+//! assert_eq!(output.as_ref(), expected.as_object());
 //! # Ok::<(), Error>(())
 //! ```
 //!
@@ -118,13 +118,14 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
+//! use simd_json::{borrowed::Value, prelude::*};
+//!
 //! let output = Pattern::compile("%{?first_name} %{last_name}, %{age}")?;
-//! let output = output.run("John Doe, 22").unwrap_or_default();
-//! let mut expected = Object::new();
-//! expected.insert("last_name".into(), Value::from("Doe"));
-//! expected.insert("age".into(), Value::from("22"));
-//! assert_eq!(output, expected);
+//! let output = output.run("John Doe, 22");
+//! let mut expected = Value::object();
+//! expected.try_insert("last_name", "Doe");
+//! expected.try_insert("age", "22");
+//! assert_eq!(output.as_ref(), expected.as_object());
 //! # Ok::<(), Error>(())
 //! ```
 //!
@@ -137,13 +138,14 @@
 //! ```rust
 //!
 //! use dissect::{Pattern, Error};
-//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
+//! use simd_json::{borrowed::Value, prelude::*};
+//!
 //! let output = Pattern::compile("%{name}, %{age:int}")?;
-//! let output = output.run( "John Doe, 22").unwrap_or_default();
-//! let mut expected = Object::new();
-//! expected.insert("name".into(), Value::from("John Doe"));
-//! expected.insert("age".into(),Value::from(22));
-//! assert_eq!(output, expected);
+//! let output = output.run( "John Doe, 22");
+//! let mut expected = Value::object();
+//! expected.try_insert("name", "John Doe");
+//! expected.try_insert("age",22);
+//! assert_eq!(output.as_ref(), expected.as_object());
 //! # Ok::<(), Error>(())
 //! ```
 //!
@@ -154,25 +156,27 @@
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
+//! use simd_json::{borrowed::Value, prelude::*};
+//!
 //! let output = Pattern::compile("%{name}, %{_}%{age}")?;
-//! let output = output.run("John Doe,                22").unwrap_or_default();
-//! let mut expected = Object::new();
-//! expected.insert("name".into(), Value::from("John Doe"));
-//! expected.insert("age".into(), Value::from("22"));
-//! assert_eq!(output, expected);
+//! let output = output.run("John Doe,                22");
+//! let mut expected = Value::object();
+//! expected.try_insert("name", "John Doe");
+//! expected.try_insert("age", "22");
+//! assert_eq!(output.as_ref(), expected.as_object());
 //! # Ok::<(), Error>(())
 //! ```
 //!
 //! ```rust
 //! use dissect::{Pattern, Error};
-//! use simd_json::{borrowed::{Value, Object}, ObjectInit};
+//! use simd_json::{borrowed::Value, prelude::*};
+//!
 //! let output = Pattern::compile("%{name}, %{_(-)}%{age}")?;
-//! let output = output.run("John Doe, -----------------------22").unwrap_or_default();
-//! let mut expected = Object::new();
-//! expected.insert("name".into(), Value::from("John Doe"));
-//! expected.insert("age".into(), Value::from("22"));
-//! assert_eq!(output, expected);
+//! let output = output.run("John Doe, -----------------------22");
+//! let mut expected = Value::object();
+//! expected.try_insert("name","John Doe");
+//! expected.try_insert("age", "22");
+//! assert_eq!(output.as_ref(), expected.as_object());
 //! # Ok::<(), Error>(())
 //! ```
 
@@ -403,10 +407,9 @@ impl Pattern {
                             return Err(Error::PaddingFollowedBySelf(idx));
                         };
                         false
+                    } else if was_extract {
+                        return Err(Error::ConnectedExtractors(idx));
                     } else {
-                        if was_extract {
-                            return Err(Error::ConnectedExtractors(idx));
-                        };
                         true
                     };
                     commands.push(p);
@@ -475,12 +478,7 @@ impl Pattern {
                 // No more pattern we're good if no data is left otherwise
                 // we do not match
                 None => {
-                    return if data.is_empty() {
-                        Some(r)
-                    } else {
-                        // We still have data left so it's not a string
-                        None
-                    };
+                    return data.is_empty().then_some(r);
                 }
                 // We want to skip some text, do so if it's there
                 Some(Command::Delimiter(s)) => {
@@ -617,8 +615,7 @@ impl PartialEq<Vec<Command>> for Pattern {
 #[cfg(test)]
 mod test {
     use super::*;
-    use simd_json::value::borrowed::Value;
-    use simd_json::ObjectInit;
+    use simd_json::{value::borrowed::Value, Builder, Mutable, ValueAccess};
 
     fn cp(pattern: &str) -> Pattern {
         Pattern::compile(pattern).expect("failed to compile pattern")
@@ -964,10 +961,13 @@ mod test {
     fn do_extract2() {
         let p = Pattern::compile("this is a %{what} case named %{name}")
             .expect("failed to compile pattern");
-        let mut m = Object::new();
-        m.insert("what".into(), Value::from("test"));
-        m.insert("name".into(), Value::from("cake"));
-        assert_eq!(p.run("this is a test case named cake"), Some(m));
+        let mut m = Value::object();
+        m.try_insert("what", "test");
+        m.try_insert("name", "cake");
+        assert_eq!(
+            p.run("this is a test case named cake").as_ref(),
+            m.as_object()
+        );
     }
 
     #[test]
@@ -996,10 +996,13 @@ mod test {
                 },
             ]
         );
-        let mut m = Object::new();
-        m.insert("what".into(), Value::from("test"));
-        m.insert("name".into(), Value::from("cake"));
-        assert_eq!(p.run("this is a test      case named cake"), Some(m));
+        let mut m = Value::object();
+        m.try_insert("what", "test");
+        m.try_insert("name", "cake");
+        assert_eq!(
+            p.run("this is a test      case named cake").as_ref(),
+            m.as_object()
+        );
     }
 
     #[test]
@@ -1009,8 +1012,8 @@ mod test {
             p,
             vec![pad(" "), del("this"), pad(" "), pad("-"), del("works"),]
         );
-        let m = simd_json::borrowed::Object::new();
-        assert_eq!(p.run("this     -----works"), Some(m));
+        let m = Value::object();
+        assert_eq!(p.run("this     -----works").as_ref(), m.as_object());
     }
 
     #[test]
@@ -1031,40 +1034,40 @@ mod test {
                 del("|"),
             ]
         );
-        let mut m = Object::new();
-        m.insert("n".into(), Value::from("Jim"));
-        assert_eq!(p.run("|Jim |"), Some(m));
-        let mut m = Object::new();
-        m.insert("n".into(), Value::from("John"));
-        assert_eq!(p.run("|John|"), Some(m));
+        let mut m = Value::object();
+        m.try_insert("n", "Jim");
+        assert_eq!(p.run("|Jim |").as_ref(), m.as_object());
+        let mut m = Value::object();
+        m.try_insert("n", "John");
+        assert_eq!(p.run("|John|").as_ref(), m.as_object());
     }
 
     #[test]
     fn middle_pads() {
         let p = cp("%{a}%{_}%{b}");
         assert_eq!(p, vec![pat("a"), pad(" "), pat("b"),]);
-        let mut m = Object::new();
-        m.insert("a".into(), Value::from("this"));
-        m.insert("b".into(), Value::from("works"));
-        assert_eq!(p.run("this     works"), Some(m));
+        let mut m = Value::object();
+        m.try_insert("a", "this");
+        m.try_insert("b", "works");
+        assert_eq!(p.run("this     works").as_ref(), m.as_object());
     }
 
     #[test]
     fn left_pads() {
         let p = Pattern::compile("%{_}%{b}").expect("failed to compile pattern");
         assert_eq!(p, vec![pad(" "), pat("b"),]);
-        let mut m = Object::new();
-        m.insert("b".into(), Value::from("works"));
-        assert_eq!(p.run("     works"), Some(m));
+        let mut m = Value::object();
+        m.try_insert("b", "works");
+        assert_eq!(p.run("     works").as_ref(), m.as_object());
     }
 
     #[test]
     fn right_pads() {
         let p = Pattern::compile("%{a}%{_}").expect("failed to compile pattern");
         assert_eq!(p, vec![pat("a"), pad(" ")]);
-        let mut m = Object::new();
-        m.insert("a".into(), Value::from("this"));
-        assert_eq!(p.run("this     "), Some(m));
+        let mut m = Value::object();
+        m.try_insert("a", "this");
+        assert_eq!(p.run("this     ").as_ref(), m.as_object());
     }
 
     #[test]
@@ -1083,9 +1086,9 @@ mod test {
                 pad(" "),
             ]
         );
-        let mut m = Object::new();
-        m.insert("a".into(), Value::from("this"));
-        assert_eq!(p.run("this"), Some(m));
+        let mut m = Value::object();
+        m.try_insert("a", "this");
+        assert_eq!(p.run("this").as_ref(), m.as_object());
     }
 
     #[test]
@@ -1114,19 +1117,25 @@ mod test {
                 },
             ]
         );
-        let mut m = Object::new();
-        m.insert("what".into(), Value::from("test"));
-        m.insert("name".into(), Value::from("cake"));
-        assert_eq!(p.run("this is a test case named cake"), Some(m));
+        let mut m = Value::object();
+        m.try_insert("what", "test");
+        m.try_insert("name", "cake");
+        assert_eq!(
+            p.run("this is a test case named cake").as_ref(),
+            m.as_object()
+        );
     }
 
     #[test]
     fn do_extract_ignore() {
         let p = Pattern::compile("this is a %{?what} case named %{name}")
             .expect("failed to compile pattern");
-        let mut m = Object::new();
-        m.insert("name".into(), Value::from("cake"));
-        assert_eq!(p.run("this is a test case named cake"), Some(m));
+        let mut m = Value::object();
+        m.try_insert("name", "cake");
+        assert_eq!(
+            p.run("this is a test case named cake").as_ref(),
+            m.as_object()
+        );
     }
 
     #[test]
@@ -1143,24 +1152,42 @@ mod test {
             ("test", "cake")
         );
         assert_pattern!("%{?name}: %{&name:int}", "key: 42", ("key", 42));
+        assert_pattern!("%{?name}: %{&name:float}", "key: 42.0", ("key", 42.0));
+        assert_pattern!("%{?name}: %{&name:string}", "key: 42.0", ("key", "42.0"));
     }
 
     #[test]
     fn do_arr() {
         let p = Pattern::compile("this is a %{+arr} case named %{+arr}")
             .expect("failed to compile pattern");
-        let mut m = Object::new();
-        m.insert("arr".into(), Value::from("test cake"));
-        assert_eq!(p.run("this is a test case named cake"), Some(m));
+        let mut m = Value::object();
+        m.try_insert("arr", "test cake");
+        assert_eq!(
+            p.run("this is a test case named cake").as_ref(),
+            m.as_object()
+        );
     }
 
     #[test]
     fn do_arr_upgrade() {
         let p = Pattern::compile("this is a %{arr} case named %{+arr}")
             .expect("failed to compile pattern");
-        let mut m = Object::new();
-        m.insert("arr".into(), Value::from("test cake"));
-        assert_eq!(p.run("this is a test case named cake"), Some(m));
+        let mut m = Value::object();
+        m.try_insert("arr", "test cake");
+        assert_eq!(
+            p.run("this is a test case named cake").as_ref(),
+            m.as_object()
+        );
+    }
+    #[test]
+    fn errors() {
+        assert!(Pattern::compile("%{}%{}").is_err());
+        assert!(Pattern::compile("%{arr").is_err());
+        assert!(Pattern::compile("%{_(-)}-").is_err());
+        assert!(Pattern::compile("%{_-}-").is_err());
+        assert!(Pattern::compile("%{a:bad-type}-").is_err());
+        assert!(Pattern::compile(r"\x").is_err());
+        assert!(Pattern::compile(r"\").is_err());
     }
 
     #[allow(clippy::too_many_lines)]
