@@ -1,6 +1,6 @@
 [package]
 name = "dissect"
-version = "0.7.0"
+version = "0.7.1"
 authors = ["The Tremor Team"]
 edition = "2018"
 license = "Apache-2.0"
