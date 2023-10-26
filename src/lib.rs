@@ -615,7 +615,8 @@ impl PartialEq<Vec<Command>> for Pattern {
 #[cfg(test)]
 mod test {
     use super::*;
-    use simd_json::{value::borrowed::Value, Builder, Mutable, ValueAccess};
+    use simd_json::prelude::*;
+    use simd_json::value::borrowed::Value;
 
     fn cp(pattern: &str) -> Pattern {
         Pattern::compile(pattern).expect("failed to compile pattern")
