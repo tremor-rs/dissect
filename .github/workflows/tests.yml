@@ -6,36 +6,21 @@ jobs:
   tests-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - name: Install deps [Linux]
-        run: sudo apt-get -qy update && sudo apt-get install -y libssl-dev libssl1.1
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
         with:
-          override: true
-          profile: minimal
+          components: llvm-tools-preview
           toolchain: stable
-      - name: Run tests
-        run: cargo test --all
-  code-coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Install deps
-        run: sudo apt-get -qy update && sudo apt-get install -y libssl-dev libssl1.1
-      - uses: actions-rs/toolchain@v1
-        with:
-          override: true
-          profile: minimal
-          toolchain: stable
-      - name: Run cargo-tarpaulin
-        uses: actions-rs/tarpaulin@v0.1
+      - uses: Swatinem/rust-cache@v2
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+      - name: Generate code coverage
         env:
-          RUSTFLAGS: -C target-cpu=native
+          RUSTFLAGS: -D warnings -C target-cpu=native
+          RUST_BACKTRACE: 1
+        run: cargo llvm-cov --workspace --lcov --output-path lcov.txt
+      - uses: codecov/codecov-action@v5
         with:
-          version: "0.20.0"
-          args: " --exclude-files target* --all --out Lcov"
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: ./lcov.info
+          files: ./lcov.txt # optional
+          fail_ci_if_error: true # optional (default = false)
+          verbose: true # optional (default = false)   

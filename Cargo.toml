@@ -2,13 +2,16 @@
 name = "dissect"
 version = "0.7.3"
 authors = ["The Tremor Team"]
-edition = "2021"
+edition = "2024"
 license = "Apache-2.0"
 description = "Logstash inspired dissect extractor"
 readme = "README.md"
+repository = "https://github.com/tremor-rs/dissect"
+documentation = "https://docs.rs/dissect"
+homepage = "https://github.com/tremor-rs/dissect"
 
 [dependencies]
-simd-json = { version = "0.13" }
+simd-json = { version = "0.15" }
 
 [features]
 default = ["known-key"]
