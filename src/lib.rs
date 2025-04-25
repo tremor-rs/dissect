@@ -191,8 +191,8 @@
 #![allow(clippy::must_use_candidate)]
 
 use simd_json::{
-    value::borrowed::{Object, Value},
     ObjectHasher,
+    value::borrowed::{Object, Value},
 };
 use std::{collections::HashMap, fmt};
 
@@ -405,7 +405,7 @@ impl Pattern {
                     was_extract = if let Command::Padding(pad) = &p {
                         if pattern.starts_with(pad) {
                             return Err(Error::PaddingFollowedBySelf(idx));
-                        };
+                        }
                         false
                     } else if was_extract {
                         return Err(Error::ConnectedExtractors(idx));
@@ -489,7 +489,7 @@ impl Pattern {
                     }
                 }
                 Some(Command::Padding(p)) => {
-                    last_sep = p.clone();
+                    last_sep.clone_from(p);
                     data = data.trim_start_matches(p);
                 }
                 // We know a extractor can never be followed by another extractor
@@ -600,7 +600,7 @@ impl Pattern {
                         Some(_) => return None,
                     }
                 }
-            };
+            }
             t += 1;
         }
     }
@@ -1195,195 +1195,179 @@ mod test {
     #[test]
     fn dissect_all_usecases() {
         let patterns = vec![
-                    (
-                        "%{syslog_timestamp} %{wf_host} %{syslog_program}: %{syslog_message}%{_}",
-                        "12345 host program: message ",
-                        v(&([
-                            ("syslog_timestamp", "12345"),
-                            ("wf_host", "host"),
-                            ("syslog_program", "program"),
-                            ("syslog_message", "message"),
-                        ])),
-                    ),
-                    (
-                        "%{syslog_timestamp} %{wf_host} %{syslog_program}: %{syslog_message}",
-                        "12345 host program: message",
-                        v(&([
-                            ("syslog_timestamp", "12345"),
-                            ("wf_host", "host"),
-                            ("syslog_program", "program"),
-                            ("syslog_message", "message"),
-                        ])),
-                    ),
-                    (
-                        "%{}, [%{log_timestamp} #%{pid}] %{log_level} -- %{}: %{message}",
-                        "foo, [12345 #12] high -- 1: log failed",
-                        v(&([
-                            ("log_timestamp", "12345"),
-                            ("pid", "12"),
-                            ("log_level", "high"),
-                            ("message", "log failed"),
-                        ])),
-                    ),
-                    (
-                        "%{}>%{+syslog_timestamp} %{+syslog_timestamp} %{+syslog_timestamp} %{syslog_hostname} %{syslog_program}: %{full_message}",
-                        "foo>12345 67890 12345 host program: log failed",
-                        v(&([
-                                 ("syslog_timestamp", "12345 67890 12345"),
-                                 ("syslog_hostname", "host"),
-                                 ("syslog_program", "program"),
-                                 ("full_message", "log failed")
-                        ]))
-                    ),
-
-                    (
-                        "%{syslog_timestamp} %{wf_host} %{}: %{log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{job_name} %{build_num} %{message} completed: %{completed}\n",
-                        "12345 host foo: 12345 67890 12345 67890 12345 some_job 12345 some_message completed: 100\n",
-                        v(&([
-                                 ("syslog_timestamp", "12345"),
-                                  ("wf_host", "host"),
-                                  ("log_timestamp", "12345 67890 12345 67890 12345"),
-                                  ("job_name", "some_job"),
-                                  ("build_num", "12345"),
-                                  ("message", "some_message"),
-                                  ("completed", "100"),
-                        ])),
-                    ),
-                    (
-                        "%{syslog_timestamp} %{wf_host} %{}: %{log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{job_name} %{build_num} %{message}\n",
-                        "12345 host foo: 12345 67890 12345 67890 12345 nice_job 900 here we go again\n",
-                        v(&([
-                                 ("syslog_timestamp", "12345"),
-                                 ("wf_host", "host"),
-                                 ("log_timestamp", "12345 67890 12345 67890 12345"),
-                                 ("job_name", "nice_job"),
-                                 ("build_num", "900"),
-                                 ("message", "here we go again")
-                        ]))
-                    ),
-                   (
-                        "%{syslog_timestamp} %{wf_host} %{} %{log_timestamp}  %{log_level}    %{main}     %{logger}%{_}%{message}%{_}",
-                        "12345 host foo 12345  high    main     dummy_logger some_message  ",
-                        v(&[
-                                    ("syslog_timestamp", "12345"),
-                                    ("wf_host", "host"),
-                                    ("log_timestamp", "12345"),
-                                    ("log_level", "high"),
-                                    ("main", "main"),
-                                    ("logger", "dummy_logger"),
-                                    ("message", "some_message")
-                                ])
-                        ),
-                        (
-                        "%{syslog_timestamp} %{host} %{?kafka_tag} %{log_timestamp}: %{log_level} (%{logger}): %{full_message}",
-                        "12345 foo some_tag 12345: high (dummy): welcome",
-                        v(&[
-                               ("syslog_timestamp", "12345"),
-                                ("host", "foo"),
-                                ("log_timestamp", "12345"),
-                                ("log_level", "high"),
-                                ("logger", "dummy"),
-                                ("full_message", "welcome")
-                        ])
-                        ),
-                        (
-                            "%{syslog_timestamp} %{host} %{} %{message}",
-                            "12345 foo bar here we go",
-                            v(&[
-                                   ("syslog_timestamp", "12345"),
-                                   ("host", "foo"),
-                                   ("message", "here we go")
-                            ])
-                            ),
-
-                            (
-
-
-                        "%{syslog_timestamp} %{host}  %{log_timestamp} %{+log_timestamp} %{message}",
-                        "12345 foo  12345 67890 this works well",
-                        v(&[
-                               ("syslog_timestamp", "12345"),
-                               ("host", "foo"),
-                               ("log_timestamp", "12345 67890"),
-                               ("message", "this works well")
-                        ])
-
-                        ),
-        (
-                        "%{syslog_timestamp} %{host}%{_}[%{log_timestamp}][%{log_level}%{_}][%{logger}%{_}] %{message}",
-                        "12345 foo [12345 67890][high ][dummy ] too many brackets here",
-                        v(&[
-                               ("syslog_timestamp", "12345"),
-                               ("host", "foo"),
-                               ("log_timestamp", "12345 67890"),
-                               ("log_level", "high"),
-                               ("logger", "dummy"),
-                               ("message", "too many brackets here")
-                        ])
-                        ),
-
-        (
-                        "%{syslog_timestamp} %{host}  %{} %{} %{} %{} %{syslog_program}[%{syslog_pid}]: %{message}",
-                        "12345 foo  i dont care about program[12345]: some message here",
-                        v(&[
-                               ("syslog_timestamp", "12345"),
-                               ("host", "foo"),
-                               ("syslog_program", "program"),
-                               ("syslog_pid", "12345"),
-                               ("message", "some message here")
-                            ])
-
-
-                        ),
-                        (
-
-                            "%{syslog_timestamp} %{host}%{_}[%{log_timestamp}][%{log_level}%{_}][%{logger}%{_}] %{message}",
-                            "12345 foo [12345][high ][dummy ] alexanderplatz",
-                            v(&[
-                                   ("syslog_timestamp", "12345"),
-                                   ("host", "foo"),
-                                   ("log_timestamp", "12345"),
-                                   ("log_level", "high"),
-                                   ("logger", "dummy"),
-                                   ("message", "alexanderplatz")
-                            ])
-        ),
-        (
-                        "%{} %{} %{} %{source} %{}:%{message}",
-                        "foo bar baz light quox:this was fun",
-                        v(&[
-                               ("source", "light"),
-                               ("message", "this was fun")
-                        ])
-                        ),
-
-                        (
-
-                            "%{syslog_timestamp} %{wf_host}%{_}%{}: %{syslog_message}",
-                            "12345 host foo: lorem ipsum",
-                            v(&[
-                                   ("syslog_timestamp", "12345"),
-                                   ("wf_host", "host"),
-                                   ("syslog_message", "lorem ipsum")
-                            ])
-
-                            ),
-
-                            (
+            (
+                "%{syslog_timestamp} %{wf_host} %{syslog_program}: %{syslog_message}%{_}",
+                "12345 host program: message ",
+                v(&([
+                    ("syslog_timestamp", "12345"),
+                    ("wf_host", "host"),
+                    ("syslog_program", "program"),
+                    ("syslog_message", "message"),
+                ])),
+            ),
+            (
+                "%{syslog_timestamp} %{wf_host} %{syslog_program}: %{syslog_message}",
+                "12345 host program: message",
+                v(&([
+                    ("syslog_timestamp", "12345"),
+                    ("wf_host", "host"),
+                    ("syslog_program", "program"),
+                    ("syslog_message", "message"),
+                ])),
+            ),
+            (
+                "%{}, [%{log_timestamp} #%{pid}] %{log_level} -- %{}: %{message}",
+                "foo, [12345 #12] high -- 1: log failed",
+                v(&([
+                    ("log_timestamp", "12345"),
+                    ("pid", "12"),
+                    ("log_level", "high"),
+                    ("message", "log failed"),
+                ])),
+            ),
+            (
+                "%{}>%{+syslog_timestamp} %{+syslog_timestamp} %{+syslog_timestamp} %{syslog_hostname} %{syslog_program}: %{full_message}",
+                "foo>12345 67890 12345 host program: log failed",
+                v(&([
+                    ("syslog_timestamp", "12345 67890 12345"),
+                    ("syslog_hostname", "host"),
+                    ("syslog_program", "program"),
+                    ("full_message", "log failed"),
+                ])),
+            ),
+            (
+                "%{syslog_timestamp} %{wf_host} %{}: %{log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{job_name} %{build_num} %{message} completed: %{completed}\n",
+                "12345 host foo: 12345 67890 12345 67890 12345 some_job 12345 some_message completed: 100\n",
+                v(&([
+                    ("syslog_timestamp", "12345"),
+                    ("wf_host", "host"),
+                    ("log_timestamp", "12345 67890 12345 67890 12345"),
+                    ("job_name", "some_job"),
+                    ("build_num", "12345"),
+                    ("message", "some_message"),
+                    ("completed", "100"),
+                ])),
+            ),
+            (
+                "%{syslog_timestamp} %{wf_host} %{}: %{log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{job_name} %{build_num} %{message}\n",
+                "12345 host foo: 12345 67890 12345 67890 12345 nice_job 900 here we go again\n",
+                v(&([
+                    ("syslog_timestamp", "12345"),
+                    ("wf_host", "host"),
+                    ("log_timestamp", "12345 67890 12345 67890 12345"),
+                    ("job_name", "nice_job"),
+                    ("build_num", "900"),
+                    ("message", "here we go again"),
+                ])),
+            ),
+            (
+                "%{syslog_timestamp} %{wf_host} %{} %{log_timestamp}  %{log_level}    %{main}     %{logger}%{_}%{message}%{_}",
+                "12345 host foo 12345  high    main     dummy_logger some_message  ",
+                v(&[
+                    ("syslog_timestamp", "12345"),
+                    ("wf_host", "host"),
+                    ("log_timestamp", "12345"),
+                    ("log_level", "high"),
+                    ("main", "main"),
+                    ("logger", "dummy_logger"),
+                    ("message", "some_message"),
+                ]),
+            ),
+            (
+                "%{syslog_timestamp} %{host} %{?kafka_tag} %{log_timestamp}: %{log_level} (%{logger}): %{full_message}",
+                "12345 foo some_tag 12345: high (dummy): welcome",
+                v(&[
+                    ("syslog_timestamp", "12345"),
+                    ("host", "foo"),
+                    ("log_timestamp", "12345"),
+                    ("log_level", "high"),
+                    ("logger", "dummy"),
+                    ("full_message", "welcome"),
+                ]),
+            ),
+            (
+                "%{syslog_timestamp} %{host} %{} %{message}",
+                "12345 foo bar here we go",
+                v(&[
+                    ("syslog_timestamp", "12345"),
+                    ("host", "foo"),
+                    ("message", "here we go"),
+                ]),
+            ),
+            (
+                "%{syslog_timestamp} %{host}  %{log_timestamp} %{+log_timestamp} %{message}",
+                "12345 foo  12345 67890 this works well",
+                v(&[
+                    ("syslog_timestamp", "12345"),
+                    ("host", "foo"),
+                    ("log_timestamp", "12345 67890"),
+                    ("message", "this works well"),
+                ]),
+            ),
+            (
+                "%{syslog_timestamp} %{host}%{_}[%{log_timestamp}][%{log_level}%{_}][%{logger}%{_}] %{message}",
+                "12345 foo [12345 67890][high ][dummy ] too many brackets here",
+                v(&[
+                    ("syslog_timestamp", "12345"),
+                    ("host", "foo"),
+                    ("log_timestamp", "12345 67890"),
+                    ("log_level", "high"),
+                    ("logger", "dummy"),
+                    ("message", "too many brackets here"),
+                ]),
+            ),
+            (
+                "%{syslog_timestamp} %{host}  %{} %{} %{} %{} %{syslog_program}[%{syslog_pid}]: %{message}",
+                "12345 foo  i dont care about program[12345]: some message here",
+                v(&[
+                    ("syslog_timestamp", "12345"),
+                    ("host", "foo"),
+                    ("syslog_program", "program"),
+                    ("syslog_pid", "12345"),
+                    ("message", "some message here"),
+                ]),
+            ),
+            (
+                "%{syslog_timestamp} %{host}%{_}[%{log_timestamp}][%{log_level}%{_}][%{logger}%{_}] %{message}",
+                "12345 foo [12345][high ][dummy ] alexanderplatz",
+                v(&[
+                    ("syslog_timestamp", "12345"),
+                    ("host", "foo"),
+                    ("log_timestamp", "12345"),
+                    ("log_level", "high"),
+                    ("logger", "dummy"),
+                    ("message", "alexanderplatz"),
+                ]),
+            ),
+            (
+                "%{} %{} %{} %{source} %{}:%{message}",
+                "foo bar baz light quox:this was fun",
+                v(&[("source", "light"), ("message", "this was fun")]),
+            ),
+            (
+                "%{syslog_timestamp} %{wf_host}%{_}%{}: %{syslog_message}",
+                "12345 host foo: lorem ipsum",
+                v(&[
+                    ("syslog_timestamp", "12345"),
+                    ("wf_host", "host"),
+                    ("syslog_message", "lorem ipsum"),
+                ]),
+            ),
+            (
                 "%{syslog_timestamp} %{host}%{_}%{}: %{syslog_message}",
                 "12345 ghost foo: this is the last one",
                 v(&[
-                       ("syslog_timestamp", "12345"),
-                       ("host", "ghost"),
-                       ("syslog_message", "this is the last one")
-                ])
-                ),
-                                (
-                                    "this is a %{?what} named %{name}",
-                                    "this is a test named cake",
-                                    v(&[("name", "cake")])
-                                    )
-                ];
+                    ("syslog_timestamp", "12345"),
+                    ("host", "ghost"),
+                    ("syslog_message", "this is the last one"),
+                ]),
+            ),
+            (
+                "this is a %{?what} named %{name}",
+                "this is a test named cake",
+                v(&[("name", "cake")]),
+            ),
+        ];
 
         for (pattern, input, expected) in patterns {
             assert_eq!(run(pattern, input), expected);
@@ -1393,67 +1377,67 @@ mod test {
     #[test]
     fn test_patterns() {
         let _patterns_orig = vec![
-        //logstash.git.transform.conf.erb
-        "%{syslog_timestamp} %{wf_host} %{syslog_program}: %{syslog_message->}",
-        "%{syslog_timestamp} %{wf_host} %{syslog_program}: %{syslog_message}",
-        "%{}, [%{log_timestamp} #%{pid}]  %{log_level} -- %{}: %{message}",
-        "%{}>%{+syslog_timestamp/1} %{+syslog_timestamp/2} %{+syslog_timestamp/3} %{syslog_hostname} %{syslog_program}: %{full_message}",
-        // logstash.sox.source.conf.erb
-        "%{syslog_timestamp} %{wf_host} %{}: %{log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{job_name} %{build_num} %{message} completed: %{completed}\n",
-        "%{syslog_timestamp} %{wf_host} %{}: %{log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{job_name} %{build_num} %{message}\n",
-        // logstash.presto.source.conf.erb
-        "%{syslog_timestamp} %{wf_host} %{} %{log_timestamp}	%{log_level}	%{main}	%{logger->}	%{message->}",
-        // logstash.aerospike.source.conf.erb
-        "%{syslog_timestamp} %{host} %{?kafka_tag} %{log_timestamp}: %{log_level} (%{logger}): %{full_message}",
-        // logstash.siem.sink.conf.erb
-        "%{syslog_timestamp} %{host} %{} %{message}",
-        // logstash.puppet.transform.conf.erb
-        "%{syslog_timestamp} %{host} %{syslog_program}: %{syslog_message->}",
-        // logstash.edw.conf.erb
-        "%{syslog_timestamp} %{host}  %{log_timestamp} %{+log_timestamp} %{message}",
-        // logstash.eslog.conf.erb
-        "%{syslog_timestamp} %{host->} [%{log_timestamp}][%{log_level->}][%{logger->}] %{message}",
-        "%{syslog_timestamp} %{host}  %{} %{} %{} %{} %{syslog_program}[%{syslog_pid}]: %{message}",
-        "%{log_level} %{log_timestamp}: %{logger}: %{message}",
-        "%{syslog_timestamp} %{host->} [%{log_timestamp}][%{log_level->}][%{logger->}] %{message}",
-        "%{} %{} %{} %{source} %{}:%{message}",
-        // logstash.misc.conf.erb
-        "%{syslog_timestamp} %{wf_host->} %{}: %{syslog_message}",
-        "%{syslog_timestamp} %{host->} %{}: %{syslog_message}",
-    ];
+            //logstash.git.transform.conf.erb
+            "%{syslog_timestamp} %{wf_host} %{syslog_program}: %{syslog_message->}",
+            "%{syslog_timestamp} %{wf_host} %{syslog_program}: %{syslog_message}",
+            "%{}, [%{log_timestamp} #%{pid}]  %{log_level} -- %{}: %{message}",
+            "%{}>%{+syslog_timestamp/1} %{+syslog_timestamp/2} %{+syslog_timestamp/3} %{syslog_hostname} %{syslog_program}: %{full_message}",
+            // logstash.sox.source.conf.erb
+            "%{syslog_timestamp} %{wf_host} %{}: %{log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{job_name} %{build_num} %{message} completed: %{completed}\n",
+            "%{syslog_timestamp} %{wf_host} %{}: %{log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{job_name} %{build_num} %{message}\n",
+            // logstash.presto.source.conf.erb
+            "%{syslog_timestamp} %{wf_host} %{} %{log_timestamp}	%{log_level}	%{main}	%{logger->}	%{message->}",
+            // logstash.aerospike.source.conf.erb
+            "%{syslog_timestamp} %{host} %{?kafka_tag} %{log_timestamp}: %{log_level} (%{logger}): %{full_message}",
+            // logstash.siem.sink.conf.erb
+            "%{syslog_timestamp} %{host} %{} %{message}",
+            // logstash.puppet.transform.conf.erb
+            "%{syslog_timestamp} %{host} %{syslog_program}: %{syslog_message->}",
+            // logstash.edw.conf.erb
+            "%{syslog_timestamp} %{host}  %{log_timestamp} %{+log_timestamp} %{message}",
+            // logstash.eslog.conf.erb
+            "%{syslog_timestamp} %{host->} [%{log_timestamp}][%{log_level->}][%{logger->}] %{message}",
+            "%{syslog_timestamp} %{host}  %{} %{} %{} %{} %{syslog_program}[%{syslog_pid}]: %{message}",
+            "%{log_level} %{log_timestamp}: %{logger}: %{message}",
+            "%{syslog_timestamp} %{host->} [%{log_timestamp}][%{log_level->}][%{logger->}] %{message}",
+            "%{} %{} %{} %{source} %{}:%{message}",
+            // logstash.misc.conf.erb
+            "%{syslog_timestamp} %{wf_host->} %{}: %{syslog_message}",
+            "%{syslog_timestamp} %{host->} %{}: %{syslog_message}",
+        ];
         // translation:
         // remove /*
         // replace '->}' with '}%{_}'
         // remove ' ' after %{_}
         let patterns = vec![
-        //logstash.git.transform.conf.erb
-        "%{syslog_timestamp} %{wf_host} %{syslog_program}: %{syslog_message}%{_}",
-        "%{syslog_timestamp} %{wf_host} %{syslog_program}: %{syslog_message}",
-        "%{}, [%{log_timestamp} #%{pid}]  %{log_level} -- %{}: %{message}",
-        "%{}>%{+syslog_timestamp} %{+syslog_timestamp} %{+syslog_timestamp} %{syslog_hostname} %{syslog_program}: %{full_message}",
-        // logstash.sox.source.conf.erb
-        "%{syslog_timestamp} %{wf_host} %{}: %{log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{job_name} %{build_num} %{message} completed: %{completed}\n",
-        "%{syslog_timestamp} %{wf_host} %{}: %{log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{job_name} %{build_num} %{message}\n",
-        // logstash.presto.source.conf.erb
-        "%{syslog_timestamp} %{wf_host} %{} %{log_timestamp}	%{log_level}	%{main}	%{logger}%{_}%{message}%{_}",
-        // logstash.aerospike.source.conf.erb
-        "%{syslog_timestamp} %{host} %{?kafka_tag} %{log_timestamp}: %{log_level} (%{logger}): %{full_message}",
-        // logstash.siem.sink.conf.erb
-        "%{syslog_timestamp} %{host} %{} %{message}",
-        // logstash.puppet.transform.conf.erb
-        "%{syslog_timestamp} %{host} %{syslog_program}: %{syslog_message}%{_}",
-        // logstash.edw.conf.erb
-        "%{syslog_timestamp} %{host}  %{log_timestamp} %{+log_timestamp} %{message}",
-        // logstash.eslog.conf.erb
-        "%{syslog_timestamp} %{host}%{_}[%{log_timestamp}][%{log_level}%{_}][%{logger}%{_}] %{message}",
-        "%{syslog_timestamp} %{host}  %{} %{} %{} %{} %{syslog_program}[%{syslog_pid}]: %{message}",
-        "%{log_level} %{log_timestamp}: %{logger}: %{message}",
-        "%{syslog_timestamp} %{host}%{_}[%{log_timestamp}][%{log_level}%{_}][%{logger}%{_}] %{message}",
-        "%{} %{} %{} %{source} %{}:%{message}",
-        // logstash.misc.conf.erb
-        "%{syslog_timestamp} %{wf_host}%{_}%{}: %{syslog_message}",
-        "%{syslog_timestamp} %{host}%{_}%{}: %{syslog_message}",
-    ];
+            //logstash.git.transform.conf.erb
+            "%{syslog_timestamp} %{wf_host} %{syslog_program}: %{syslog_message}%{_}",
+            "%{syslog_timestamp} %{wf_host} %{syslog_program}: %{syslog_message}",
+            "%{}, [%{log_timestamp} #%{pid}]  %{log_level} -- %{}: %{message}",
+            "%{}>%{+syslog_timestamp} %{+syslog_timestamp} %{+syslog_timestamp} %{syslog_hostname} %{syslog_program}: %{full_message}",
+            // logstash.sox.source.conf.erb
+            "%{syslog_timestamp} %{wf_host} %{}: %{log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{job_name} %{build_num} %{message} completed: %{completed}\n",
+            "%{syslog_timestamp} %{wf_host} %{}: %{log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{+log_timestamp} %{job_name} %{build_num} %{message}\n",
+            // logstash.presto.source.conf.erb
+            "%{syslog_timestamp} %{wf_host} %{} %{log_timestamp}	%{log_level}	%{main}	%{logger}%{_}%{message}%{_}",
+            // logstash.aerospike.source.conf.erb
+            "%{syslog_timestamp} %{host} %{?kafka_tag} %{log_timestamp}: %{log_level} (%{logger}): %{full_message}",
+            // logstash.siem.sink.conf.erb
+            "%{syslog_timestamp} %{host} %{} %{message}",
+            // logstash.puppet.transform.conf.erb
+            "%{syslog_timestamp} %{host} %{syslog_program}: %{syslog_message}%{_}",
+            // logstash.edw.conf.erb
+            "%{syslog_timestamp} %{host}  %{log_timestamp} %{+log_timestamp} %{message}",
+            // logstash.eslog.conf.erb
+            "%{syslog_timestamp} %{host}%{_}[%{log_timestamp}][%{log_level}%{_}][%{logger}%{_}] %{message}",
+            "%{syslog_timestamp} %{host}  %{} %{} %{} %{} %{syslog_program}[%{syslog_pid}]: %{message}",
+            "%{log_level} %{log_timestamp}: %{logger}: %{message}",
+            "%{syslog_timestamp} %{host}%{_}[%{log_timestamp}][%{log_level}%{_}][%{logger}%{_}] %{message}",
+            "%{} %{} %{} %{source} %{}:%{message}",
+            // logstash.misc.conf.erb
+            "%{syslog_timestamp} %{wf_host}%{_}%{}: %{syslog_message}",
+            "%{syslog_timestamp} %{host}%{_}%{}: %{syslog_message}",
+        ];
         for p in patterns {
             assert!(Pattern::compile(p).is_ok());
         }
