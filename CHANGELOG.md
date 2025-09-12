@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.5](https://github.com/tremor-rs/dissect/compare/v0.7.4...v0.7.5) - 2025-09-12
+
+### Other
+
+- Bump actions/checkout from 4 to 5
+- Bump simd-json from 0.15.1 to 0.16.0
+
 ## [0.7.4](https://github.com/tremor-rs/dissect/compare/v0.7.3...v0.7.4) - 2025-04-27
 
 ### Other
