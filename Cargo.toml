@@ -11,7 +11,7 @@ documentation = "https://docs.rs/dissect"
 homepage = "https://github.com/tremor-rs/dissect"
 
 [dependencies]
-simd-json = { version = "0.16" }
+simd-json = { version = "0.17" }
 
 [features]
 default = ["known-key"]
