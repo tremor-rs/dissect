@@ -6,13 +6,13 @@ jobs:
   license:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Check license headers
         run: ./.github/checks/copyright.sh
   sanity:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Safety checks
         run: ./.github/checks/safety.sh -a
   unused-deps:
@@ -22,13 +22,13 @@ jobs:
         run: sudo snap install remarshal
       - name: Install deps
         run: sudo snap install --classic ripgrep
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Check for unused dependencies
         run: ./.github/checks/deps.sh .
   format:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@master
         with:
           components: rustfmt
@@ -38,7 +38,7 @@ jobs:
   clippy-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install deps
         run: sudo apt-get -qy update && sudo apt-get install -y libssl-dev libssl3
       - uses: dtolnay/rust-toolchain@master
